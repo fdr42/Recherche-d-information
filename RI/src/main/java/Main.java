@@ -38,7 +38,7 @@ public class Main {
 
 
        List<String> stopWords= new ArrayList<>();
-       File file = new File("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\stopWords");
+       File file = new File("./stopWords");
        Scanner input = new Scanner(file);
        input.useDelimiter(" +|\\n|\\r"); //delimitor is one or more spaces
 
@@ -48,7 +48,7 @@ public class Main {
       
        try {
            System.out.println(stopWords);
-           Indexation.indexFile("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\file",stopWords);
+           Indexation.indexFile("./file",stopWords);
        } catch (FileNotFoundException ex) {
            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
        }

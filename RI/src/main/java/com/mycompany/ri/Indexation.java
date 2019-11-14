@@ -20,9 +20,10 @@ public class Indexation {
     public static void indexFile(String path, List<String> stopWords) throws FileNotFoundException {
         List<Document> listeDoc = new ArrayList<>();
         Document currentDoc = null;
-        File file = new File("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\file");
+        File file = new File(path);
         Scanner input = new Scanner(file);
-        input.useDelimiter(" +|\\n|\\r|\'");
+        String pattern = "[ \\t\\.,:;\\r]";
+        input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,():=-]|\\d");
 
         int i = 0;
         while (input.hasNext()) {
@@ -33,6 +34,8 @@ public class Indexation {
                 currentDoc = new Document(string);//On crée le document avec son ID
             } else if (string.equals("</doc>")) {//Fin de doc: on l'ajoute a la liste
                 listeDoc.add(currentDoc);
+                System.out.println(currentDoc.index.size());
+                System.out.println(currentDoc.index);
                 //  System.out.println("NOUVEAU DOC / " + currentDoc.id + " numero :  "+i+" taille :  "+currentDoc.index.size());
                 i++;
                 // System.out.println(currentDoc.index);
@@ -43,7 +46,9 @@ public class Indexation {
             } else if (!stopWords.contains(string) && string.length() > 1) {//Ajout des mots a l'index
                 currentDoc.index.put(string, currentDoc.getTf(string) + 1);
             }
+
         }
+
 
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :

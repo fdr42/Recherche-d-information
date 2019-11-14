@@ -71,7 +71,7 @@ public class Document {
      //   String[] queryList = query.split(" ");
 
         List<String> stopWords= new ArrayList<>();
-        File file = new File("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\stopWords");
+        File file = new File("./stopWords");
         Scanner input = new Scanner(file);
         input.useDelimiter(" +|\\n|\\r"); //delimitor is one or more spaces
 
