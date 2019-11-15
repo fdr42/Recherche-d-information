@@ -9,79 +9,132 @@ import com.mycompany.ri.Models.Document;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
- *
  * @author fdr + madjid
  */
 public class Indexation {
+    public static String stemming(String input) {
+        if (input.endsWith("ed")) {
+            input = input.replaceAll("ed$", "");
+        } else if (input.endsWith("ing")) {
+            input = input.replaceAll("ing$", "");
+        } else if (input.endsWith("ly")) {
+            input = input.replaceAll("ly$", "");
+        } else if (input.endsWith("sses")) {
+            input = input.replaceAll("sses$", "ss");
+        } else if (input.endsWith("ss")) {
+
+        } else if (input.endsWith("s")) {
+            input = input.replaceAll("s$", "");
+        }
+        return input;
+    }
 
     public static void indexFile(String path, List<String> stopWords) throws FileNotFoundException {
         List<Document> listeDoc = new ArrayList<>();
         Document currentDoc = null;
         File file = new File(path);
         Scanner input = new Scanner(file);
-        String pattern = "[ \\t\\.,:;\\r]";
-        input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,():=-]|\\d");
+        input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,():=-]");
 
-        int i = 0;
+        double i = 0;
+        int j=0;
         while (input.hasNext()) {
+            double percent=((double)(i / 19198619)) * 100;
+            if(percent>j) {
+                System.out.print((int)percent);
+                System.out.println("%");
+                j++;
+            }
+            i++;
             String string = input.next().toLowerCase();
-            if (string.contains("<doc><docno>")) {//Nouveau document
+            if (string.contains("<doc><docno>") || string.contains("<doc><docno>")) {//Nouveau document
                 string = string.replace("<doc><docno>", "");
                 string = string.replace("</docno>", "");
+
                 currentDoc = new Document(string);//On crée le document avec son ID
             } else if (string.equals("</doc>")) {//Fin de doc: on l'ajoute a la liste
                 listeDoc.add(currentDoc);
-                System.out.println(currentDoc.index.size());
-                System.out.println(currentDoc.index);
-                //  System.out.println("NOUVEAU DOC / " + currentDoc.id + " numero :  "+i+" taille :  "+currentDoc.index.size());
-                i++;
-                // System.out.println(currentDoc.index);
-                // for (Map.Entry<String, Integer> entry : currentDoc.index.entrySet()) {
-                //     System.out.println(">>>"+entry.getKey() + "/" + currentDoc.getTermFrequecy(entry.getKey()));
-                // }
+               i++;
 
-            } else if (!stopWords.contains(string) && string.length() > 1) {//Ajout des mots a l'index
-                currentDoc.index.put(string, currentDoc.getTf(string) + 1);
+
+            } else if (!stopWords.contains(string)
+                    && stemming(string).length() > 1
+                    && !string.matches(".*\\d.*")
+                    && !string.contains("/")) {//Ajout des mots a l'index
+                currentDoc.index.put(stemming(string), currentDoc.getTf(string) + 1);
             }
 
         }
 
-
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :
 
-
+        List<String> stemmedList;
         List<String[]> listeQ = new ArrayList<>();
         String query = "olive oil health benefit";
         String[] queryList = query.split(" ");
-        listeQ.add(queryList);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList) {
+        stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+        //listeQ.add(queryList); //Liste sans stemming
 
         String query1 = "notting hill film actors";
         String[] queryList1 = query1.split(" ");
-        listeQ.add(queryList1);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList1) {
+            stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+        //listeQ.add(queryList1);
 
         String query2 = "probabilistic models in information retrieval";
         String[] queryList2 = query2.split(" ");
-        listeQ.add(queryList2);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList2) {
+            stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+      //  listeQ.add(queryList2);
 
         String query3 = "web link network analysis";
         String[] queryList3 = query3.split(" ");
-        listeQ.add(queryList3);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList3) {
+            stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+       // listeQ.add(queryList3);
 
         String query4 = "web ranking scoring algorithm";
         String[] queryList4 = query4.split(" ");
-        listeQ.add(queryList4);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList4) {
+            stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+        //listeQ.add(queryList4);
 
         String query5 = "supervised machine learning algorithm";
         String[] queryList5 = query5.split(" ");
-        listeQ.add(queryList5);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList5) {
+            stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+        //listeQ.add(queryList5);
 
         String query6 = "operating system +mutual +exclusion";
         String[] queryList6 = query6.split(" ");
-        listeQ.add(queryList6);
+        stemmedList=new ArrayList<>();
+        for(String s : queryList6) {
+            stemmedList.add(stemming(s));
+        }
+        listeQ.add(stemmedList.toArray(new String[0]));
+        //listeQ.add(queryList6);
 
 
         List<String> listeNumQ = new ArrayList<>();
@@ -178,13 +231,13 @@ public class Indexation {
         mapTriee = MapUtil.sortByValue(mapFinale);
 
 
-        mapTriee1 =  MapUtil.sortByValue(mapQuery1);
-        mapTriee2 =  MapUtil.sortByValue(mapQuery2);
-        mapTriee3 =  MapUtil.sortByValue(mapQuery3);
-        mapTriee4 =  MapUtil.sortByValue(mapQuery4);
-        mapTriee5 =  MapUtil.sortByValue(mapQuery5);
-        mapTriee6 =  MapUtil.sortByValue(mapQuery6);
-        mapTriee7 =  MapUtil.sortByValue(mapQuery7);
+        mapTriee1 = MapUtil.sortByValue(mapQuery1);
+        mapTriee2 = MapUtil.sortByValue(mapQuery2);
+        mapTriee3 = MapUtil.sortByValue(mapQuery3);
+        mapTriee4 = MapUtil.sortByValue(mapQuery4);
+        mapTriee5 = MapUtil.sortByValue(mapQuery5);
+        mapTriee6 = MapUtil.sortByValue(mapQuery6);
+        mapTriee7 = MapUtil.sortByValue(mapQuery7);
 
 
         /*
@@ -215,7 +268,7 @@ public class Indexation {
         List<String> queryListTriee1 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee1.entrySet()) {
             queryListTriee1.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
@@ -225,14 +278,14 @@ public class Indexation {
         System.out.println(queryListTriee1);
         Collections.reverse(queryListTriee1);
         System.out.println(queryListTriee1);
-        System.out.println("Il y a "+zero+" zeros dans cette liste");
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
         zero = 0;
 
         List<String> queryListTriee2 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee2.entrySet()) {
             queryListTriee2.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
@@ -244,14 +297,14 @@ public class Indexation {
         System.out.println(queryListTriee2);
         Collections.reverse(queryListTriee2);
         System.out.println(queryListTriee2);
-        System.out.println("Il y a "+zero+" zeros dans cette liste");
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
         zero = 0;
 
         List<String> queryListTriee3 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee3.entrySet()) {
             queryListTriee3.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
@@ -260,12 +313,10 @@ public class Indexation {
         int trois = zero;
 
 
-
         System.out.println(queryListTriee3);
         Collections.reverse(queryListTriee3);
         System.out.println(queryListTriee3);
-        System.out.println("Il y a "+zero+" zeros dans cette liste");
-
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
 
         zero = 0;
@@ -273,12 +324,11 @@ public class Indexation {
         List<String> queryListTriee4 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee4.entrySet()) {
             queryListTriee4.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
 
         }
-
 
 
         int quatre = zero;
@@ -286,9 +336,7 @@ public class Indexation {
         System.out.println(queryListTriee4);
         Collections.reverse(queryListTriee4);
         System.out.println(queryListTriee4);
-        System.out.println("Il y a "+zero+" zeros dans cette liste");
-
-
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
 
         zero = 0;
@@ -296,18 +344,17 @@ public class Indexation {
         List<String> queryListTriee5 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee5.entrySet()) {
             queryListTriee5.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
 
-        int cinq=zero;
+        int cinq = zero;
 
         System.out.println(queryListTriee5);
         Collections.reverse(queryListTriee5);
         System.out.println(queryListTriee5);
-        System.out.println("Il y a "+zero+" zeros dans cette liste");
-
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
 
         zero = 0;
@@ -315,7 +362,7 @@ public class Indexation {
         List<String> queryListTriee6 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee6.entrySet()) {
             queryListTriee6.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
@@ -326,8 +373,7 @@ public class Indexation {
         System.out.println(queryListTriee6);
         Collections.reverse(queryListTriee6);
         System.out.println(queryListTriee6);
-        System.out.println("Il y a "+zero+" zeros dans cette liste");
-
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
 
         zero = 0;
@@ -335,7 +381,7 @@ public class Indexation {
         List<String> queryListTriee7 = new ArrayList<String>();
         for (Map.Entry<String, Double> entry : mapTriee7.entrySet()) {
             queryListTriee7.add(entry.getKey());
-            if(entry.getValue().equals(0.0)){
+            if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
@@ -350,7 +396,7 @@ public class Indexation {
         //System.out.println("Il y a "+zero+" zeros dans cette liste");
 
 
-       // System.out.println(" "+un+" - "+ deux+"  -  "+trois+"  - "+quatre+" - "+cinq+" - "+six+" - "+ sept);
+        // System.out.println(" "+un+" - "+ deux+"  -  "+trois+"  - "+quatre+" - "+cinq+" - "+six+" - "+ sept);
 
         PrintWriter testOut = null;
         PrintWriter run2 = null;
@@ -359,8 +405,7 @@ public class Indexation {
         PrintWriter run5 = null;
 
 
-
-        try{
+        try {
             testOut = new PrintWriter(new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_01_LTN_articles.txt"))));
             run2 = new PrintWriter(new OutputStreamWriter(
@@ -372,108 +417,106 @@ public class Indexation {
             run5 = new PrintWriter(new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_05_LTN_articles.txt"))));
         } catch (Exception e1) {
-        e1.printStackTrace();
-        System.out.println(e1);
+            e1.printStackTrace();
+            System.out.println(e1);
         }
 
-        for(int run=0; run<5; run++){
-            switch (run){
+        for (int run = 0; run < 5; run++) {
+            switch (run) {
                 case 1:
-                for(int compt=0;compt<1500;compt++){
-                    testOut.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                for(int compt=0;compt<1500;compt++){
-                     testOut.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                for(int compt=0;compt<1500;compt++){
-                    testOut.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                for(int compt=0;compt<1500;compt++){
-                    testOut.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                for(int compt=0;compt<1500;compt++){
-                    testOut.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                for(int compt=0;compt<1500;compt++){
-                    testOut.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                for(int compt=0;compt<1500;compt++){
-                    testOut.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt+1)));
-                }
-                break;
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    for (int compt = 0; compt < 1500; compt++) {
+                        testOut.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt + 1)));
+                    }
+                    break;
                 case 2:
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
-                    for(int compt=1500;compt<3000;compt++){
-                        run2.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt+1-1500)));
+                    for (int compt = 1500; compt < 3000; compt++) {
+                        run2.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 1500)));
                     }
                     break;
 
 
                 case 3:
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
-                    for(int compt=3000;compt<4500;compt++){
-                        run3.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt+1-3000)));
+                    for (int compt = 3000; compt < 4500; compt++) {
+                        run3.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 3000)));
                     }
                     break;
 
 
-
-
                 case 4:
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee1.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee2.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee3.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee4.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee5.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee6.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
-                    for(int compt=4500;compt<6000;compt++){
-                        run4.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt+1-4500)));
+                    for (int compt = 4500; compt < 6000; compt++) {
+                        run4.println(queryListTriee7.get(compt).replaceAll("<>", String.valueOf(compt + 1 - 4500)));
                     }
                     break;
 
@@ -489,24 +532,22 @@ public class Indexation {
         run5.close();
 
 
-
-
         PrintWriter out = null;
         PrintWriter out2 = null;
         PrintWriter out3 = null;
         PrintWriter out4 = null;
         PrintWriter out5 = null;
 
-        int co=1500;
-        int co1=1500;
-        int co2=1500;
-        int co3=1500;
-        int co4=1500;
+        int co = 1500;
+        int co1 = 1500;
+        int co2 = 1500;
+        int co3 = 1500;
+        int co4 = 1500;
 
 
         try {
             out = new PrintWriter(new OutputStreamWriter(
-                       new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_01_01_LTN_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_01_01_LTN_articles.txt"))));
 
             out2 = new PrintWriter(new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_01_02_LTN_articles.txt"))));
@@ -520,44 +561,44 @@ public class Indexation {
             out5 = new PrintWriter(new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_01_05_LTN_articles.txt"))));
 
-        System.out.println("Apres le tri");
-        compteur = 0;
+            System.out.println("Apres le tri");
+            compteur = 0;
 
-        for (Map.Entry<String, Double> entry : mapTriee.entrySet()) {
-            if (compteur < mapTriee.size() - 4*1500 && compteur >= mapTriee.size() - 5*1500) {
-                //bw5.write(entry.getKey()+""+"\n");
+            for (Map.Entry<String, Double> entry : mapTriee.entrySet()) {
+                if (compteur < mapTriee.size() - 4 * 1500 && compteur >= mapTriee.size() - 5 * 1500) {
+                    //bw5.write(entry.getKey()+""+"\n");
 
-                out5.println(entry.getKey().replaceAll("<>", String.valueOf(co)));
-                co--;
-                //runs 5
-            }else if(compteur < mapTriee.size() - 3*1500 && compteur >= mapTriee.size() - 4*1500) {
-                //runs 4
-                //bw4.write(entry.getKey()+""+"\n");
-                out4.println(entry.getKey().replaceAll("<>", String.valueOf(co1)));
-                co1--;
-            }else if(compteur < mapTriee.size() - 2*1500 && compteur >= mapTriee.size() - 3*1500) {
-                //runs 3
-               // bw3.write(entry.getKey()+""+"\n");
-                out3.println(entry.getKey().replaceAll("<>", String.valueOf(co2)));
-                co2--;
-            }else if(compteur < mapTriee.size() - 1500 && compteur >= mapTriee.size() - 2*1500) {
-                //runs 2
-                //bw2.write(entry.getKey()+""+"\n");
-                out2.println(entry.getKey().replaceAll("<>", String.valueOf(co3)));
-                co3--;
-            }else if(compteur >= mapTriee.size() - 1500){
-                //runs 1
-               // bw1.write(entry.getKey()+""+"\n");
-                //System.out.println(entry.getKey());
-                out.println(entry.getKey().replaceAll("<>", String.valueOf(co4)));
-                co4--;
+                    out5.println(entry.getKey().replaceAll("<>", String.valueOf(co)));
+                    co--;
+                    //runs 5
+                } else if (compteur < mapTriee.size() - 3 * 1500 && compteur >= mapTriee.size() - 4 * 1500) {
+                    //runs 4
+                    //bw4.write(entry.getKey()+""+"\n");
+                    out4.println(entry.getKey().replaceAll("<>", String.valueOf(co1)));
+                    co1--;
+                } else if (compteur < mapTriee.size() - 2 * 1500 && compteur >= mapTriee.size() - 3 * 1500) {
+                    //runs 3
+                    // bw3.write(entry.getKey()+""+"\n");
+                    out3.println(entry.getKey().replaceAll("<>", String.valueOf(co2)));
+                    co2--;
+                } else if (compteur < mapTriee.size() - 1500 && compteur >= mapTriee.size() - 2 * 1500) {
+                    //runs 2
+                    //bw2.write(entry.getKey()+""+"\n");
+                    out2.println(entry.getKey().replaceAll("<>", String.valueOf(co3)));
+                    co3--;
+                } else if (compteur >= mapTriee.size() - 1500) {
+                    //runs 1
+                    // bw1.write(entry.getKey()+""+"\n");
+                    //System.out.println(entry.getKey());
+                    out.println(entry.getKey().replaceAll("<>", String.valueOf(co4)));
+                    co4--;
+                }
+
+                compteur++;
             }
 
-            compteur++;
-        }
 
-
-        out.close();
+            out.close();
             out2.close();
             out3.close();
             out5.close();
