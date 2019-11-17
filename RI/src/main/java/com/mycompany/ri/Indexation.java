@@ -14,6 +14,7 @@ import java.util.*;
  * @author fdr + madjid
  */
 public class Indexation {
+    /* Old
     public static String stemming(String input) {
         if (input.endsWith("ed")) {
             input = input.replaceAll("ed$", "");
@@ -29,8 +30,30 @@ public class Indexation {
             input = input.replaceAll("s$", "");
         }
         return input;
-    }
+    }*/
 
+    public static String[] listQuery(String query){
+        String[] queryList = query.split(" ");
+        List<String> stemmedList;
+        stemmedList=new ArrayList<>();
+        for(String s : queryList) {
+            stemmedList.add(PorterStemmer.stemWord(s));
+        }
+       return stemmedList.toArray(new String[0]);
+    }
+    public static List<String> queryListTriee(Map<String, Double> maptriee) {
+        List<String> queryListTriee = new ArrayList<>();
+        int zero=0;
+        for (Map.Entry<String, Double> entry : maptriee.entrySet()) {
+            queryListTriee.add(entry.getKey());
+            if (entry.getValue().equals(0.0)) {
+                zero++;
+            }
+        }
+        System.out.println(queryListTriee);
+        System.out.println("Il y a " + zero + " zeros dans cette liste");
+        return queryListTriee;
+    }
     public static void indexFile(String path, List<String> stopWords) throws FileNotFoundException {
         List<Document> listeDoc = new ArrayList<>();
         Document currentDoc = null;
@@ -41,15 +64,21 @@ public class Indexation {
         double i = 0;
         int j=0;
         while (input.hasNext()) {
-            double percent=((double)(i / 19198619)) * 100;
+            double percent=(i / 19198619) * 100;
             if(percent>j) {
-                System.out.print((int)percent);
-                System.out.println("%");
+                for(int k=0;k<50;k++)
+                     System.out.print("\b\b\b");
+                System.out.print((int)percent+"% [");
+                for(int k=0;k<j/2;k++)
+                    System.out.print("=");
+                for(int k=j/2;k<100/2;k++)
+                    System.out.print(" ");
+                System.out.print("]");
                 j++;
             }
             i++;
             String string = input.next().toLowerCase();
-            if (string.contains("<doc><docno>") || string.contains("<doc><docno>")) {//Nouveau document
+            if (string.contains("<doc><docno>")) {//Nouveau document
                 string = string.replace("<doc><docno>", "");
                 string = string.replace("</docno>", "");
 
@@ -57,13 +86,15 @@ public class Indexation {
             } else if (string.equals("</doc>")) {//Fin de doc: on l'ajoute a la liste
                 listeDoc.add(currentDoc);
                i++;
-
+               // System.out.println(currentDoc.index.size());
+               // System.out.println(currentDoc.index);
 
             } else if (!stopWords.contains(string)
-                    && stemming(string).length() > 1
+                    && PorterStemmer.stemWord(string).length() > 1
                     && !string.matches(".*\\d.*")
                     && !string.contains("/")) {//Ajout des mots a l'index
-                currentDoc.index.put(stemming(string), currentDoc.getTf(string) + 1);
+                string=PorterStemmer.stemWord(string);
+                currentDoc.index.put(string, currentDoc.getTf(string) + 1);
             }
 
         }
@@ -71,71 +102,15 @@ public class Indexation {
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :
 
-        List<String> stemmedList;
+
         List<String[]> listeQ = new ArrayList<>();
-        String query = "olive oil health benefit";
-        String[] queryList = query.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList) {
-        stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-        //listeQ.add(queryList); //Liste sans stemming
-
-        String query1 = "notting hill film actors";
-        String[] queryList1 = query1.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList1) {
-            stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-        //listeQ.add(queryList1);
-
-        String query2 = "probabilistic models in information retrieval";
-        String[] queryList2 = query2.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList2) {
-            stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-      //  listeQ.add(queryList2);
-
-        String query3 = "web link network analysis";
-        String[] queryList3 = query3.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList3) {
-            stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-       // listeQ.add(queryList3);
-
-        String query4 = "web ranking scoring algorithm";
-        String[] queryList4 = query4.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList4) {
-            stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-        //listeQ.add(queryList4);
-
-        String query5 = "supervised machine learning algorithm";
-        String[] queryList5 = query5.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList5) {
-            stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-        //listeQ.add(queryList5);
-
-        String query6 = "operating system +mutual +exclusion";
-        String[] queryList6 = query6.split(" ");
-        stemmedList=new ArrayList<>();
-        for(String s : queryList6) {
-            stemmedList.add(stemming(s));
-        }
-        listeQ.add(stemmedList.toArray(new String[0]));
-        //listeQ.add(queryList6);
-
+        listeQ.add(listQuery("olive oil health benefit"));
+        listeQ.add(listQuery("notting hill film actors"));
+        listeQ.add(listQuery("probabilistic models in information retrieval"));
+        listeQ.add(listQuery("web link network analysis"));
+        listeQ.add(listQuery("web ranking scoring algorithm"));
+        listeQ.add(listQuery("supervised machine learning algorithm"));
+        listeQ.add(listQuery("operating system +mutual +exclusion"));
 
         List<String> listeNumQ = new ArrayList<>();
         listeNumQ.add("2009011");
@@ -147,52 +122,49 @@ public class Indexation {
         listeNumQ.add("2009085");
 
 
-        Map<String, Double> mapFinale = new HashMap<String, Double>();
+        Map<String, Double> mapFinale = new HashMap<>();
 
         //map pour chaque requete
-        Map<String, Double> mapQuery1 = new HashMap<String, Double>();
-        Map<String, Double> mapQuery2 = new HashMap<String, Double>();
-        Map<String, Double> mapQuery3 = new HashMap<String, Double>();
-        Map<String, Double> mapQuery4 = new HashMap<String, Double>();
-        Map<String, Double> mapQuery5 = new HashMap<String, Double>();
-        Map<String, Double> mapQuery6 = new HashMap<String, Double>();
-        Map<String, Double> mapQuery7 = new HashMap<String, Double>();
+        Map<String, Double> mapQuery1 = new HashMap<>();
+        Map<String, Double> mapQuery2 = new HashMap<>();
+        Map<String, Double> mapQuery3 = new HashMap<>();
+        Map<String, Double> mapQuery4 = new HashMap<>();
+        Map<String, Double> mapQuery5 = new HashMap<>();
+        Map<String, Double> mapQuery6 = new HashMap<>();
+        Map<String, Double> mapQuery7 = new HashMap<>();
 
         String tag = "<>";
         int compteur = 0;
-        int compteurNonNul = 0;
         //pour chaque doc
         for (int q = 0; q < listeQ.size(); q++) {
-            for (int compteurDoc = 0; compteurDoc < listeDoc.size(); compteurDoc++) {
+            for (Document doc : listeDoc) {
                 //pour chaque query
                 compteur++;
-                double cosSim = Document.cosineSimilarity(listeDoc.get(compteurDoc), listeQ.get(q));
-                if (cosSim != 0.0) {
-                    compteurNonNul++;
-                }
-                mapFinale.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
-                System.out.println(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]");
+                double cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
+
+                mapFinale.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                System.out.println(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]");
                 switch (q) {
                     case 0:
-                        mapQuery1.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery1.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                     case 1:
-                        mapQuery2.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery2.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                     case 2:
-                        mapQuery3.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery3.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                     case 3:
-                        mapQuery4.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery4.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                     case 4:
-                        mapQuery5.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery5.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                     case 5:
-                        mapQuery6.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery6.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                     case 6:
-                        mapQuery7.put(listeNumQ.get(q) + " Q0 " + listeDoc.get(compteurDoc).id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                        mapQuery7.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                         break;
                 }
 
@@ -206,28 +178,9 @@ public class Indexation {
              */
         }
 
-        Map<String, Double> mapTriee = new HashMap<String, Double>();
-        Map<String, Double> mapTriee1 = new HashMap<String, Double>();
-        Map<String, Double> mapTriee2 = new HashMap<String, Double>();
-        Map<String, Double> mapTriee3 = new HashMap<String, Double>();
-        Map<String, Double> mapTriee4 = new HashMap<String, Double>();
-        Map<String, Double> mapTriee5 = new HashMap<String, Double>();
-        Map<String, Double> mapTriee6 = new HashMap<String, Double>();
-        Map<String, Double> mapTriee7 = new HashMap<String, Double>();
+        Map<String, Double> mapTriee,mapTriee1,mapTriee2,mapTriee3,mapTriee4,mapTriee5,mapTriee6,mapTriee7 = new HashMap<>();
 
 
-        /*
-
-        System.out.println("===============================================");
-        System.out.println("Taille mapQuery1 1 : "+mapQuery1.size());
-        System.out.println("Taille mapQuery1 2 : "+mapQuery2.size());
-        System.out.println("Taille mapQuery1 3 : "+mapQuery3.size());
-        System.out.println("Taille mapQuery1 4 : "+mapQuery4.size());
-        System.out.println("Taille mapQuery1 5 : "+mapQuery5.size());
-        System.out.println("Taille mapQuery1 6 : "+mapQuery6.size());
-        System.out.println("Taille mapQuery1 7 : "+mapQuery7.size());
-
-*/
         mapTriee = MapUtil.sortByValue(mapFinale);
 
 
@@ -240,163 +193,29 @@ public class Indexation {
         mapTriee7 = MapUtil.sortByValue(mapQuery7);
 
 
-        /*
+            //on met les hashmap dans des arralist pour reverse facilement
 
 
-
-        int limit = 0;
-        for (Map.Entry<String, Double> entry : mapQuery1.entrySet()) {
-            if(limit<100){
-                System.out.println(">>> "+entry.getKey());
-                limit++;
-            }
-        }
-        limit=0;
-        System.out.println("----------------");
-        for (Map.Entry<String, Double> entry : mapTriee1.entrySet()) {
-            if(limit<100){
-                System.out.println(">>> "+entry.getKey());
-                limit++;
-            }
-        }
-
-*/
-
-        //on met les hashmap dans des arralist pour reverse facilement
-
-        int zero = 0;
-        List<String> queryListTriee1 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee1.entrySet()) {
-            queryListTriee1.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-        }
-
-        int un = zero;
-
-        System.out.println(queryListTriee1);
+        List<String> queryListTriee1 =queryListTriee(mapTriee1) ;
         Collections.reverse(queryListTriee1);
-        System.out.println(queryListTriee1);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
-        zero = 0;
-
-        List<String> queryListTriee2 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee2.entrySet()) {
-            queryListTriee2.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-        }
-
-
-        int deux = zero;
-
-
-        System.out.println(queryListTriee2);
+        List<String> queryListTriee2 = queryListTriee(mapTriee2);
         Collections.reverse(queryListTriee2);
-        System.out.println(queryListTriee2);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
-        zero = 0;
-
-        List<String> queryListTriee3 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee3.entrySet()) {
-            queryListTriee3.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-        }
-
-
-        int trois = zero;
-
-
-        System.out.println(queryListTriee3);
+        List<String> queryListTriee3 = queryListTriee(mapTriee3);
         Collections.reverse(queryListTriee3);
-        System.out.println(queryListTriee3);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
-
-        zero = 0;
-
-        List<String> queryListTriee4 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee4.entrySet()) {
-            queryListTriee4.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-
-        }
-
-
-        int quatre = zero;
-
-        System.out.println(queryListTriee4);
+        List<String> queryListTriee4 = queryListTriee(mapTriee4);
         Collections.reverse(queryListTriee4);
-        System.out.println(queryListTriee4);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
-
-        zero = 0;
-
-        List<String> queryListTriee5 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee5.entrySet()) {
-            queryListTriee5.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-        }
-
-        int cinq = zero;
-
-        System.out.println(queryListTriee5);
+        List<String> queryListTriee5 = queryListTriee(mapTriee5);
         Collections.reverse(queryListTriee5);
-        System.out.println(queryListTriee5);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
-
-        zero = 0;
-
-        List<String> queryListTriee6 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee6.entrySet()) {
-            queryListTriee6.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-        }
-
-
-        int six = zero;
-
-        System.out.println(queryListTriee6);
+        List<String> queryListTriee6 = queryListTriee(mapTriee6);
         Collections.reverse(queryListTriee6);
-        System.out.println(queryListTriee6);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
 
-
-        zero = 0;
-
-        List<String> queryListTriee7 = new ArrayList<String>();
-        for (Map.Entry<String, Double> entry : mapTriee7.entrySet()) {
-            queryListTriee7.add(entry.getKey());
-            if (entry.getValue().equals(0.0)) {
-                zero++;
-            }
-        }
-
-
-        int sept = zero;
-
-
-        //System.out.println(queryListTriee7);
+        List<String> queryListTriee7 = queryListTriee(mapTriee7);
         Collections.reverse(queryListTriee7);
-        //System.out.println(queryListTriee7);
-        //System.out.println("Il y a "+zero+" zeros dans cette liste");
-
-
-        // System.out.println(" "+un+" - "+ deux+"  -  "+trois+"  - "+quatre+" - "+cinq+" - "+six+" - "+ sept);
 
         PrintWriter testOut = null;
         PrintWriter run2 = null;
@@ -532,11 +351,11 @@ public class Indexation {
         run5.close();
 
 
-        PrintWriter out = null;
-        PrintWriter out2 = null;
-        PrintWriter out3 = null;
-        PrintWriter out4 = null;
-        PrintWriter out5 = null;
+        PrintWriter out;
+        PrintWriter out2;
+        PrintWriter out3;
+        PrintWriter out4;
+        PrintWriter out5;
 
         int co = 1500;
         int co1 = 1500;
