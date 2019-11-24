@@ -50,8 +50,8 @@ public class Indexation {
                 zero++;
             }
         }
-        System.out.println(queryListTriee);
-        System.out.println("Il y a " + zero + " zeros dans cette liste");
+       // System.out.println(queryListTriee);
+        //System.out.println("Il y a " + zero + " zeros dans cette liste");
         return queryListTriee;
     }
     public static void indexFile(String path, List<String> stopWords) throws FileNotFoundException {
@@ -59,13 +59,13 @@ public class Indexation {
         Document currentDoc = null;
         File file = new File(path);
         Scanner input = new Scanner(file);
-        input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,():=-]");
+        input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,()=-]");
 
         double i = 0;
         int j=0;
         while (input.hasNext()) {
             double percent=(i / 19198619) * 100;
-            if(percent>j) {
+           if(percent>j) {
                 for(int k=0;k<50;k++)
                      System.out.print("\b\b\b");
                 System.out.print((int)percent+"% [");
@@ -76,6 +76,7 @@ public class Indexation {
                 System.out.print("]");
                 j++;
             }
+
             i++;
             String string = input.next().toLowerCase();
             if (string.contains("<doc><docno>")) {//Nouveau document
@@ -86,7 +87,7 @@ public class Indexation {
             } else if (string.equals("</doc>")) {//Fin de doc: on l'ajoute a la liste
                 listeDoc.add(currentDoc);
                i++;
-               // System.out.println(currentDoc.index.size());
+              //  System.out.println(currentDoc.index.size());
                // System.out.println(currentDoc.index);
 
             } else if (!stopWords.contains(string)
@@ -98,6 +99,8 @@ public class Indexation {
             }
 
         }
+
+        System.out.println("<<<<<<<<<<<<<<<<"+i);
 
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :
@@ -140,10 +143,24 @@ public class Indexation {
             for (Document doc : listeDoc) {
                 //pour chaque query
                 compteur++;
-                double cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
+
+                double cosSim;
+                if(Main.choix.equals("ATN")){
+                     cosSim = Document.atn(doc, listeQ.get(q));
+                }else if(Main.choix.equals("BM25")){
+                     cosSim = Document.okapi(doc, listeQ.get(q),listeDoc);
+                }else if (Main.choix.equals("LTN")){
+                     cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
+                }else {
+                    System.out.println("Erreur, cette fonction n'est pas connue \n " +
+                            "Par défaut, on va prendre LTN \n" +
+                            "Cordialement");
+                     cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
+                }
+
 
                 mapFinale.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
-                System.out.println(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]");
+                //System.out.println(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]");
                 switch (q) {
                     case 0:
                         mapQuery1.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
@@ -226,15 +243,15 @@ public class Indexation {
 
         try {
             testOut = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_01_LTN_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_01_"+Main.choix+"_articles.txt"))));
             run2 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_02_LTN_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_02_"+Main.choix+"_articles.txt"))));
             run3 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_03_LTN_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_03_"+Main.choix+"_articles.txt"))));
             run4 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_04_LTN_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_04_"+Main.choix+"_articles.txt"))));
             run5 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_05_LTN_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_05_"+Main.choix+"_articles.txt"))));
         } catch (Exception e1) {
             e1.printStackTrace();
             System.out.println(e1);
@@ -364,6 +381,8 @@ public class Indexation {
         int co4 = 1500;
 
 
+
+        /*
         try {
             out = new PrintWriter(new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_01_01_LTN_articles.txt"))));
@@ -380,7 +399,7 @@ public class Indexation {
             out5 = new PrintWriter(new OutputStreamWriter(
                     new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_01_05_LTN_articles.txt"))));
 
-            System.out.println("Apres le tri");
+           // System.out.println("Apres le tri");
             compteur = 0;
 
             for (Map.Entry<String, Double> entry : mapTriee.entrySet()) {
@@ -426,6 +445,8 @@ public class Indexation {
             e1.printStackTrace();
             System.out.println(e1);
         }
+
+        */
 
         TreeMap<String, Double> treeMap = new TreeMap<>(Collections.reverseOrder());
         treeMap.putAll(mapTriee);
