@@ -139,6 +139,7 @@ public class Indexation {
         String tag = "<>";
         int compteur = 0;
         //pour chaque doc
+        boolean passed = false;
         for (int q = 0; q < listeQ.size(); q++) {
             for (Document doc : listeDoc) {
                 //pour chaque query
@@ -152,9 +153,12 @@ public class Indexation {
                 }else if (Main.choix.equals("LTN")){
                      cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
                 }else {
-                    System.out.println("Erreur, cette fonction n'est pas connue \n " +
-                            "Par défaut, on va prendre LTN \n" +
-                            "Cordialement");
+                    if(!passed){
+                        System.out.println("Erreur, cette fonction n'est pas connue \n " +
+                                "Par défaut, on va prendre LTN \n" +
+                                "Cordialement");
+                        passed = true;
+                    }
                      cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
                 }
 
@@ -243,15 +247,15 @@ public class Indexation {
 
         try {
             testOut = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_01_"+Main.choix+"_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_01_"+Main.choix+"_articles_k"+Main.k1+"b"+Main.b+".txt"))));
             run2 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_02_"+Main.choix+"_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_02_"+Main.choix+"_articles_k"+Main.k1+"b"+Main.b+".txt"))));
             run3 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_03_"+Main.choix+"_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_03_"+Main.choix+"_articles_k"+Main.k1+"b"+Main.b+".txt"))));
             run4 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_04_"+Main.choix+"_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_04_"+Main.choix+"_articles_k"+Main.k1+"b"+Main.b+".txt"))));
             run5 = new PrintWriter(new OutputStreamWriter(
-                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_05_"+Main.choix+"_articles.txt"))));
+                    new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_05_"+Main.choix+"_articles_k"+Main.k1+"b"+Main.b+".txt"))));
         } catch (Exception e1) {
             e1.printStackTrace();
             System.out.println(e1);

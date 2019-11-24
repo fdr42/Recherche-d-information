@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static String choix;
+    public static double b;
+    public static  double k1;
 
     public static void main(String[] args) throws FileNotFoundException {
 
@@ -39,7 +41,18 @@ public class Main {
                 "Votre choix : ");
         choix = sc.nextLine();
         System.out.println("Vous avez choisi : " + choix);
+        if(choix.equals("BM25")){
+            System.out.println("Paramètre b :  [0,3 - 0,9] virgule, pas point");
+            //sc.nextLine();
+            b = sc.nextDouble();
+            System.out.println("Paramètre k1 : [1,2 - 2,0] virgule, pas point");
+            //sc.nextLine();
+            k1 = sc.nextDouble();
 
+            System.out.println("Lancement de BM25 avec : \n" +
+                    "b = "+b+"\n" +
+                    "k1 = "+k1);
+        }
 
         long startTime = System.nanoTime();
         List<String> stopWords = new ArrayList<>();

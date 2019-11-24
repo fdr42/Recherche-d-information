@@ -5,6 +5,8 @@
  */
 package com.mycompany.ri.Models;
 
+import com.mycompany.ri.Main;
+
 import javax.print.Doc;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -101,8 +103,8 @@ public class Document {
     public static double okapi(Document doc, String[] queryList, List<Document> listeDoc){
         double score = 0;
 
-        double k1 = 1.5;
-        double b=0.75;
+        double k1 = Main.k1;
+        double b = Main.b;
         double tailleD = doc.index.size();
 
         //attention ici c'est la taille moyenne de la collection d'ou est extrait
