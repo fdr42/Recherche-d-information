@@ -63,6 +63,7 @@ public class Indexation {
 
         double i = 0;
         int j=0;
+         Map<String, Integer> index=new HashMap<>();
         while (input.hasNext()) {
             double percent=(i / 19198619) * 100;
            if(percent>j) {
@@ -96,16 +97,18 @@ public class Indexation {
                     && !string.contains("/")) {//Ajout des mots a l'index
                 string=PorterStemmer.stemWord(string);
                 currentDoc.index.put(string, currentDoc.getTf(string) + 1);
+                currentDoc.totalWords++;
+                index.put(string, currentDoc.getTf(string) + 1);
             }
 
         }
-
+        System.out.println("Total unique = "+index.size());
         System.out.println("<<<<<<<<<<<<<<<<"+i);
 
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :
-
-
+Main.choice();
+System.out.println("C'est parti");
         List<String[]> listeQ = new ArrayList<>();
         listeQ.add(listQuery("olive oil health benefit"));
         listeQ.add(listQuery("notting hill film actors"));
@@ -147,11 +150,11 @@ public class Indexation {
 
                 double cosSim;
                 if(Main.choix.equals("ATN")){
-                     cosSim = Document.atn(doc, listeQ.get(q));
+                     cosSim = Document.atn(doc, listeQ.get(q),listeDoc);
                 }else if(Main.choix.equals("BM25")){
-                     cosSim = Document.okapi(doc, listeQ.get(q),listeDoc);
+                     cosSim = doc.okapi(listeQ.get(q),listeDoc);
                 }else if (Main.choix.equals("LTN")){
-                     cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
+                     cosSim = Document.cosineSimilarity(doc, listeQ.get(q),listeDoc);
                 }else {
                     if(!passed){
                         System.out.println("Erreur, cette fonction n'est pas connue \n " +
@@ -159,7 +162,7 @@ public class Indexation {
                                 "Cordialement");
                         passed = true;
                     }
-                     cosSim = Document.cosineSimilarity(doc, listeQ.get(q));
+                     cosSim = Document.cosineSimilarity(doc, listeQ.get(q),listeDoc);
                 }
 
 

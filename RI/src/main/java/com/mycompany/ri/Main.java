@@ -32,6 +32,31 @@ public class Main {
         // double test = Document.cosineSimilarity();
         // System.out.println(test);
 
+
+        long startTime = System.nanoTime();
+        List<String> stopWords = new ArrayList<>();
+        //File file = new File("./stopWords");
+        File file = new File("./stopWords");
+        Scanner input = new Scanner(file);
+        input.useDelimiter(" +|\\n|\\r"); //delimitor is one or more spaces
+        while (input.hasNext()) {
+            stopWords.add(input.next());
+        }
+
+
+        Indexation.indexFile("./file", stopWords);
+        //Indexation.indexFile("./file", stopWords);
+
+
+        long endTime = System.nanoTime();
+
+        long durationInNano = (endTime - startTime);
+
+        long durationInMillis = TimeUnit.NANOSECONDS.toMillis(durationInNano);
+
+        System.out.println("Temps total d'éxécution : "+durationInMillis);
+    }
+    public static void choice(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Bien le bonjour ! \n" +
                 "Plusieurs choix :\n" +
@@ -54,28 +79,6 @@ public class Main {
                     "k1 = "+k1);
         }
 
-        long startTime = System.nanoTime();
-        List<String> stopWords = new ArrayList<>();
-        //File file = new File("./stopWords");
-        File file = new File("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\com\\mycompany\\ri\\stopWords");
-        Scanner input = new Scanner(file);
-        input.useDelimiter(" +|\\n|\\r"); //delimitor is one or more spaces
-        while (input.hasNext()) {
-            stopWords.add(input.next());
-        }
-
-
-        Indexation.indexFile("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\com\\mycompany\\ri\\file", stopWords);
-        //Indexation.indexFile("./file", stopWords);
-
-
-        long endTime = System.nanoTime();
-
-        long durationInNano = (endTime - startTime);
-
-        long durationInMillis = TimeUnit.NANOSECONDS.toMillis(durationInNano);
-
-        System.out.println("Temps total d'éxécution : "+durationInMillis);
     }
 
 }

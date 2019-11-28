@@ -7,11 +7,9 @@ package com.mycompany.ri.Models;
 
 import com.mycompany.ri.Main;
 
-import javax.print.Doc;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.DoubleConsumer;
 
 /**
  * @author fdr
@@ -19,10 +17,12 @@ import java.util.function.DoubleConsumer;
 public class Document {
     public String id;
     public Map<String, Integer> index;
+    public int totalWords;
 
     public Document(String id) {
         this.id = id;
         this.index = new HashMap<>();
+        this.totalWords=0;
     }
 
     public int getTf(String word) {
@@ -39,8 +39,7 @@ public class Document {
     public double getTermFrequecy(String word) {
         if (index.get(word) != null) {
             double i = index.get(word);
-            double taille = index.size();
-            return i / taille;
+            return i / this.totalWords;
         }
         return 0;
     }
@@ -52,13 +51,18 @@ public class Document {
      * @param word
      * @return IDF(word)
      */
-    public double getIDF(String word) {
-        if (index.get(word) != null) {
-            double df = getTermFrequecy(word);
-            double taille = index.size();
-            return Math.log(taille / df);
+    public double getIDF(String word, List<Document> listDoc) {
+        int NbDoc=listDoc.size();
+        int nbDocPertin=0;
+        for(Document doc : listDoc) {
+            if(doc.index.get(word)!= null)
+                nbDocPertin++;
         }
-        return 0;
+
+
+
+            return Math.log((NbDoc / nbDocPertin) + 1);
+
     }
 
     /**
@@ -96,16 +100,15 @@ public class Document {
 
     /**
      * Calcul le score OKAPI BM-25
-     * @param doc
      * @param queryList
      * @return score BM25
      */
-    public static double okapi(Document doc, String[] queryList, List<Document> listeDoc){
+    public double okapi(String[] queryList, List<Document> listeDoc){
         double score = 0;
 
         double k1 = Main.k1;
         double b = Main.b;
-        double tailleD = doc.index.size();
+        double tailleD = this.index.size();
 
         //attention ici c'est la taille moyenne de la collection d'ou est extrait
 
@@ -119,7 +122,7 @@ public class Document {
 
 
         for(int i=0; i<queryList.length; i++){
-            score += doc.getIDF(queryList[i]) * ( ( doc.getTermFrequecy(queryList[i]) * (k1 +1) )/ ( doc.getTermFrequecy(queryList[i]) + k1  * (1 - b + b * (tailleD/avgD))));
+            score += this.getIDF(queryList[i],listeDoc) * ( ( this.getTermFrequecy(queryList[i]) * (k1 +1) )/ ( this.getTermFrequecy(queryList[i]) + k1  * (1 - b + b * (tailleD/avgD))));
 
         }
 
@@ -136,11 +139,11 @@ public class Document {
      * @param queryList
      * @return le score ATN
      */
-    public static double atn(Document doc, String[] queryList){
+    public static double atn(Document doc, String[] queryList,List<Document> listeDoc){
         Double score = 0.0;
 
         for(int i=0; i<queryList.length; i++){
-            score += (0.5 + 0.5 * (doc.getTf(queryList[i])/doc.maxTF())) * doc.getIDF(queryList[i]);
+            score += (0.5 + 0.5 * (doc.getTf(queryList[i])/doc.maxTF())) * doc.getIDF(queryList[i],listeDoc);
         }
 
         return score;
@@ -150,7 +153,7 @@ public class Document {
     /**
      * @return la cosine siilarity (apparamment c'est LTN mais palus vraiment sur de ça ...peut etre LTC)
      */
-    public static double cosineSimilarity(Document doc, String[] queryList) throws FileNotFoundException {
+    public static double cosineSimilarity(Document doc, String[] queryList,List<Document> listeDoc) throws FileNotFoundException {
         double cosineSimilarity = 0;
 
         //  Document doc;
@@ -161,7 +164,7 @@ public class Document {
 
         List<String> stopWords = new ArrayList<>();
         //File file = new File("./stopWords");
-        File file = new File("C:\\Users\\madji\\IdeaProjects\\Recherche-d-information\\RI\\src\\main\\java\\com\\mycompany\\ri\\stopWords");
+        File file = new File("./stopWords");
         Scanner input = new Scanner(file);
         input.useDelimiter(" +|\\n|\\r"); //delimitor is one or more spaces
 
@@ -185,8 +188,8 @@ public class Document {
             if (doc.index.containsKey(entry.getKey())) {
                 // System.out.println(">>> ce mot est partout :  "+entry.getKey());
                 // le mot de la requete existe dans le document, le dot product ne sera donc pas nul
-                double d1 = doc.getIDF(entry.getKey()) * doc.getTermFrequecy(entry.getKey());
-                double d2 = queryDoc.getIDF(entry.getKey()) * queryDoc.getTermFrequecy(entry.getKey());
+                double d1 = doc.getIDF(entry.getKey(),listeDoc) * doc.getTermFrequecy(entry.getKey());
+                double d2 = queryDoc.getIDF(entry.getKey(),listeDoc) * queryDoc.getTermFrequecy(entry.getKey());
                 dotProduct += d1 * d2;
             } else {
                 // la clé n'est pas présente, donc le dot product vaudra 0, pas besoin d'y calculer
@@ -194,8 +197,8 @@ public class Document {
         }
 
 
-        double normeQuery = norme(queryDoc);
-        double normeDoc = norme(doc);
+        double normeQuery = norme(queryDoc,listeDoc);
+        double normeDoc = norme(doc,listeDoc);
 
         cosineSimilarity = dotProduct / (normeDoc * normeQuery);
 
@@ -210,11 +213,11 @@ public class Document {
      * @param doc
      * @return norme = ||d|| = RacineCarree(d[0]² + d[1]² + ... + d[n]²)
      */
-    public static double norme(Document doc) {
+    public static double norme(Document doc,List<Document> listeDoc) {
         double norme = 0;
         for (Map.Entry<String, Integer> entry : doc.index.entrySet()) {
-            norme += (doc.getIDF(entry.getKey()) * doc.getTermFrequecy(entry.getKey()))
-                    * (doc.getIDF(entry.getKey()) * doc.getTermFrequecy(entry.getKey()));
+            norme += (doc.getIDF(entry.getKey(),listeDoc) * doc.getTermFrequecy(entry.getKey()))
+                    * (doc.getIDF(entry.getKey(),listeDoc) * doc.getTermFrequecy(entry.getKey()));
         }
         return Math.sqrt(norme);
     }
