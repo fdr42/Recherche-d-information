@@ -39,6 +39,7 @@ public class Document {
     public double getTermFrequecy(String word) {
         if (index.get(word) != null) {
             double i = index.get(word);
+           // System.out.println("TermFrequency of "+word+(i / this.totalWords));
             return i / this.totalWords;
         }
         return 0;
@@ -60,7 +61,7 @@ public class Document {
         }
 
 
-
+       // System.out.println("IDF of "+word+Math.log((NbDoc / nbDocPertin) + 1));
             return Math.log((NbDoc / nbDocPertin) + 1);
 
     }

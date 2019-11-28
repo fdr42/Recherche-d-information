@@ -12,8 +12,5 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <dependencies>
-        <dependency>
-
-        </dependency>
     </dependencies>
 </project>
