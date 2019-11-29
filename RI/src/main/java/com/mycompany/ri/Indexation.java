@@ -6,6 +6,7 @@
 package com.mycompany.ri;
 
 import com.mycompany.ri.Models.Document;
+import com.mycompany.ri.Models.Query;
 
 import java.io.*;
 import java.util.*;
@@ -14,51 +15,25 @@ import java.util.*;
  * @author fdr + madjid
  */
 public class Indexation {
-    /* Old
-    public static String stemming(String input) {
-        if (input.endsWith("ed")) {
-            input = input.replaceAll("ed$", "");
-        } else if (input.endsWith("ing")) {
-            input = input.replaceAll("ing$", "");
-        } else if (input.endsWith("ly")) {
-            input = input.replaceAll("ly$", "");
-        } else if (input.endsWith("sses")) {
-            input = input.replaceAll("sses$", "ss");
-        } else if (input.endsWith("ss")) {
 
-        } else if (input.endsWith("s")) {
-            input = input.replaceAll("s$", "");
-        }
-        return input;
-    }*/
-
-    public static String[] listQuery(String query){
-        String[] queryList = query.split(" ");
-        List<String> stemmedList;
-        stemmedList=new ArrayList<>();
-        for(String s : queryList) {
-            stemmedList.add(PorterStemmer.stemWord(s));
-        }
-       return stemmedList.toArray(new String[0]);
-    }
     public static List<String> queryListTriee(Map<String, Double> maptriee) {
         List<String> queryListTriee = new ArrayList<>();
-        int zero=0;
+        int zero = 0;
         for (Map.Entry<String, Double> entry : maptriee.entrySet()) {
             queryListTriee.add(entry.getKey());
             if (entry.getValue().equals(0.0)) {
                 zero++;
             }
         }
-       // System.out.println(queryListTriee);
+        // System.out.println(queryListTriee);
         //System.out.println("Il y a " + zero + " zeros dans cette liste");
         return queryListTriee;
     }
-    public static int chargement(double current, double total,int j){
+
+    public static int chargement(double current, double total, int j) {
 
 
         double percent = (current / total) * 100;
-        System.out.println(percent);
         if (percent > j) {
             for (int k = 0; k < 50; k++)
                 System.out.print("\b\b\b");
@@ -70,7 +45,7 @@ public class Indexation {
             System.out.print("]");
             j++;
         }
-return j;
+        return j;
 
     }
 
@@ -80,11 +55,11 @@ return j;
         File file = new File(path);
         Scanner input = new Scanner(file);
         input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,()=-]");
-        int j=0;
+        int j = 0;
         double i = 0;
-        Map<String, Integer> index = new HashMap<>();
+        //   Map<String, Integer> index = new HashMap<>();
         while (input.hasNext()) {
-          //j=chargement(i,19198619,j);
+            j = chargement(i, 19198619, j);
             i++;
             String string = input.next().toLowerCase();
             if (string.contains("<doc><docno>")) {//Nouveau document
@@ -105,37 +80,37 @@ return j;
                 string = PorterStemmer.stemWord(string);
                 currentDoc.index.put(string, currentDoc.getTf(string) + 1);
                 currentDoc.totalWords++;
-                index.put(string, currentDoc.getTf(string) + 1);
+                // index.put(string, currentDoc.getTf(string) + 1);
             }
 
         }
-        System.out.println("Total unique = " + index.size());
-        System.out.println("<<<<<<<<<<<<<<<<" + i);
+        //  System.out.println("Total unique = " + index.size());
+        // System.out.println("<<<<<<<<<<<<<<<<" + i);
 
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :
+
+
+        List<Query> listeQ = new ArrayList<>();
+        System.out.println("Calcul des IDF");
+        listeQ.add(new Query("olive oil health benefit", listeDoc, "2009011"));
+        System.out.println("1/7");
+        listeQ.add(new Query("notting hill film actors", listeDoc, "2009036"));
+        System.out.println("2/7");
+        listeQ.add(new Query("probabilistic models in information retrieval", listeDoc, "2009067"));
+        System.out.println("3/7");
+        listeQ.add(new Query("web link network analysis", listeDoc, "2009073"));
+        System.out.println("4/7");
+        listeQ.add(new Query("web ranking scoring algorithm", listeDoc, "2009074"));
+        System.out.println("5/7");
+        listeQ.add(new Query("supervised machine learning algorithm", listeDoc, "2009078"));
+        System.out.println("6/7");
+        listeQ.add(new Query("operating system +mutual +exclusion", listeDoc, "2009085"));
+
+
         while (true) {
             Main.choice();
             System.out.println("C'est parti");
-            List<String[]> listeQ = new ArrayList<>();
-            listeQ.add(listQuery("olive oil health benefit"));
-            listeQ.add(listQuery("notting hill film actors"));
-            listeQ.add(listQuery("probabilistic models in information retrieval"));
-            listeQ.add(listQuery("web link network analysis"));
-            listeQ.add(listQuery("web ranking scoring algorithm"));
-            listeQ.add(listQuery("supervised machine learning algorithm"));
-            listeQ.add(listQuery("operating system +mutual +exclusion"));
-
-            List<String> listeNumQ = new ArrayList<>();
-            listeNumQ.add("2009011");
-            listeNumQ.add("2009036");
-            listeNumQ.add("2009067");
-            listeNumQ.add("2009073");
-            listeNumQ.add("2009074");
-            listeNumQ.add("2009078");
-            listeNumQ.add("2009085");
-
-
             Map<String, Double> mapFinale = new HashMap<>();
 
             //map pour chaque requete
@@ -149,22 +124,23 @@ return j;
 
             String tag = "<>";
             double compteur = 0;
-            j=0;
-            int sizeList=listeDoc.size()*listeQ.size();
+            j = 0;
+            int sizeList = listeDoc.size() * listeQ.size();
             //pour chaque doc
             boolean passed = false;
             for (int q = 0; q < listeQ.size(); q++) {
                 for (Document doc : listeDoc) {
+                    Query query = listeQ.get(q);
                     //pour chaque query
                     compteur++;
-                    j=chargement(compteur,sizeList,j);
+                    j = chargement(compteur, sizeList, j);
                     double cosSim;
                     if (Main.choix.equals("ATN")) {
-                        cosSim = Document.atn(doc, listeQ.get(q), listeDoc);
+                        cosSim = Document.atn(doc, query, listeDoc);
                     } else if (Main.choix.equals("BM25")) {
-                        cosSim = doc.okapi(listeQ.get(q), listeDoc);
+                        cosSim = doc.okapi(query, listeDoc);
                     } else if (Main.choix.equals("LTN")) {
-                        cosSim = Document.cosineSimilarity(doc, listeQ.get(q), listeDoc);
+                        cosSim = doc.LTN(query, listeDoc);
                     } else {
                         if (!passed) {
                             System.out.println("Erreur, cette fonction n'est pas connue \n " +
@@ -172,33 +148,33 @@ return j;
                                     "Cordialement");
                             passed = true;
                         }
-                        cosSim = Document.cosineSimilarity(doc, listeQ.get(q), listeDoc);
+                        cosSim = Document.cosineSimilarity(doc, query, listeDoc);
                     }
 
 
-                    mapFinale.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                    mapFinale.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                     //System.out.println(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]");
                     switch (q) {
                         case 0:
-                            mapQuery1.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery1.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                         case 1:
-                            mapQuery2.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery2.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                         case 2:
-                            mapQuery3.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery3.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                         case 3:
-                            mapQuery4.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery4.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                         case 4:
-                            mapQuery5.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery5.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                         case 5:
-                            mapQuery6.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery6.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                         case 6:
-                            mapQuery7.put(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery7.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
                             break;
                     }
 

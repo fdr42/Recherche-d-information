@@ -262,7 +262,7 @@ public class PorterStemmer {
         };
         // (m>1) AL    ->
         // (m>1) ANCE  ->
-        for(String suffix : suffixes) {
+        for (String suffix : suffixes) {
             if (input.endsWith(suffix)) {
                 String stem = input.substring(0, input.length() - suffix.length());
                 String letterTypes = getLetterTypes(stem);
