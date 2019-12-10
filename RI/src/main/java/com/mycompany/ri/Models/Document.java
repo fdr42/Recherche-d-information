@@ -99,7 +99,6 @@ public class Document {
         }
         avgD = avgD / listeDoc.size();
 
-
         for (Map.Entry<String, Integer> entry : query.index.entrySet()) {
             score += ((this.getTermFrequecy(entry.getKey()) * (k1 + 1)) / (this.getTermFrequecy(entry.getKey()) + k1 * ((1 - b) + b * (tailleD / avgD)))) * query.getIDfBM25(listeDoc.size(), entry.getKey());
 
@@ -131,7 +130,7 @@ public class Document {
     public double LTN(Query query, List<Document> listDoc) {
         double score = 0;
         for (Map.Entry<String, Integer> entry : query.index.entrySet()) {
-            score += (1 + Math.log(this.getTermFrequecy(entry.getKey()))) * Math.log(listDoc.size() / query.getDf(entry.getKey()));
+            score += this.getTermFrequecy(entry.getKey()) * query.getIDf(listDoc.size(),entry.getKey());
         }
         return score;
 
