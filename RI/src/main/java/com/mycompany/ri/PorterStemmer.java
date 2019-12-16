@@ -36,6 +36,7 @@ public class PorterStemmer {
      * @return the stem of the word, in lowercase.
      */
     public static String stemWord(String word) {
+        //return word;
         String stem = word.toLowerCase(Locale.getDefault());
         if (stem.length() < 3) return stem;
         stem = stemStep1a(stem);
@@ -47,6 +48,7 @@ public class PorterStemmer {
         stem = stemStep5a(stem);
         stem = stemStep5b(stem);
         return stem;
+
     }
 
     static String stemStep1a(String input) {

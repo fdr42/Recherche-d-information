@@ -57,6 +57,7 @@ public class Indexation {
         input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,()=-]");
         int j = 0;
         double i = 0;
+        int nbOlives=0;
         //   Map<String, Integer> index = new HashMap<>();
         while (input.hasNext()) {
             j = chargement(i, 19198619, j);
@@ -69,23 +70,35 @@ public class Indexation {
                 currentDoc = new Document(string);//On crée le document avec son ID
             } else if (string.equals("</doc>")) {//Fin de doc: on l'ajoute a la liste
                 listeDoc.add(currentDoc);
-                i++;
+              //  System.out.println(currentDoc.index);
                 //  System.out.println(currentDoc.index.size());
                 // System.out.println(currentDoc.index);
 
             } else if (!stopWords.contains(string)
-                    && PorterStemmer.stemWord(string).length() > 1
-                    && !string.matches(".*\\d.*")
-                    && !string.contains("/")) {//Ajout des mots a l'index
+                   && PorterStemmer.stemWord(string).length()>1
+            ) {//Ajout des mots a l'index
+                string= string.replaceAll(".\\d.", "");
                 string = PorterStemmer.stemWord(string);
+                if(string.length()>1){
                 currentDoc.index.put(string, currentDoc.getTf(string) + 1);
+
                 currentDoc.totalWords++;
+                }
                 // index.put(string, currentDoc.getTf(string) + 1);
             }
 
         }
         //  System.out.println("Total unique = " + index.size());
-        // System.out.println("<<<<<<<<<<<<<<<<" + i);
+        for (Document bite:listeDoc) {
+            try {
+                nbOlives += bite.index.get("oliv");
+            }catch (Exception e){
+
+            }
+
+
+        }
+        System.out.println("<<<<<<<<<<<<<<<<" + nbOlives);
 
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
         //on va construire le run :
@@ -94,6 +107,7 @@ public class Indexation {
         List<Query> listeQ = new ArrayList<>();
         System.out.println("Calcul des IDF");
         listeQ.add(new Query("olive oil health benefit", listeDoc, "2009011"));
+        //listeQ.add(new Query("arbre ernest", listeDoc, "2009011"));
         System.out.println("1/7");
         listeQ.add(new Query("notting hill film actors", listeDoc, "2009036"));
         System.out.println("2/7");
@@ -106,6 +120,9 @@ public class Indexation {
         listeQ.add(new Query("supervised machine learning algorithm", listeDoc, "2009078"));
         System.out.println("6/7");
         listeQ.add(new Query("operating system +mutual +exclusion", listeDoc, "2009085"));
+        for (Query q:listeQ) {
+            System.out.println(q.index);
+        }
 
 
         while (true) {
@@ -128,7 +145,7 @@ public class Indexation {
             int sizeList = listeDoc.size() * listeQ.size();
             //pour chaque doc
             boolean passed = false;
-            for (int q = 0; q < listeQ.size(); q++) {
+           for (int q = 0; q < listeQ.size(); q++) {
                 for (Document doc : listeDoc) {
                     Query query = listeQ.get(q);
                     //pour chaque query
@@ -178,11 +195,11 @@ public class Indexation {
                             break;
                     }
 
-                }
-
-            /*
+               }
 
 
+
+/*
             Mettre dans le runs par requete ici
             Trier par score
              */

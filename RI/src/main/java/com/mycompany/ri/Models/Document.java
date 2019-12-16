@@ -17,8 +17,8 @@ import java.util.Map;
  */
 public class Document {
     public String id;
-    public Map<String, Integer> index;
-    public int totalWords;
+    public Map<String, Double> index;
+    public double totalWords;
 
     public Document(String id) {
         this.id = id;
@@ -26,7 +26,7 @@ public class Document {
         this.totalWords = 0;
     }
 
-    public int getTf(String word) {
+    public double getTf(String word) {
         if (index.get(word) != null) {
             return index.get(word);
         }
@@ -40,7 +40,8 @@ public class Document {
     public double getTermFrequecy(String word) {
         if (index.get(word) != null) {
             double i = index.get(word);
-            return i / this.totalWords;
+            double result=1+Math.log10(i / this.totalWords);
+                return i / this.totalWords;
         }
         return 0;
     }
@@ -52,7 +53,7 @@ public class Document {
     public double maxTF() {
         double max = 0;
         double temp = 0;
-        for (Map.Entry<String, Integer> entry : index.entrySet()) {
+        for (Map.Entry<String, Double> entry : index.entrySet()) {
             temp = this.getTf(entry.getKey());
             if (temp > max) {
                 max = temp;
@@ -99,9 +100,8 @@ public class Document {
         }
         avgD = avgD / listeDoc.size();
 
-        for (Map.Entry<String, Integer> entry : query.index.entrySet()) {
+        for (Map.Entry<String, Double> entry : query.index.entrySet()) {
             score += ((this.getTermFrequecy(entry.getKey()) * (k1 + 1)) / (this.getTermFrequecy(entry.getKey()) + k1 * ((1 - b) + b * (tailleD / avgD)))) * query.getIDfBM25(listeDoc.size(), entry.getKey());
-
         }
 
 
@@ -119,8 +119,9 @@ public class Document {
     public static double atn(Document doc, Query query, List<Document> listeDoc) {
         Double score = 0.0;
 
-        for (Map.Entry<String, Integer> entry : query.index.entrySet()) {
+        for (Map.Entry<String, Double> entry : query.index.entrySet()) {
             score += (0.5 + 0.5 * (doc.getTf(entry.getKey()) / doc.maxTF())) * query.getIDf(listeDoc.size(), entry.getKey());
+
         }
 
         return score;
@@ -129,8 +130,10 @@ public class Document {
 
     public double LTN(Query query, List<Document> listDoc) {
         double score = 0;
-        for (Map.Entry<String, Integer> entry : query.index.entrySet()) {
-            score += this.getTermFrequecy(entry.getKey()) * query.getIDf(listDoc.size(),entry.getKey());
+        Query test=query;
+        for (Map.Entry<String, Double> entry : query.index.entrySet()) {
+
+            score += (1+Math.log10(this.getTermFrequecy(entry.getKey()))) * query.getIDf(listDoc.size(),entry.getKey());
         }
         return score;
 
