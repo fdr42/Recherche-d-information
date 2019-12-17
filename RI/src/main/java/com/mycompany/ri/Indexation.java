@@ -106,8 +106,8 @@ public class Indexation {
 
         List<Query> listeQ = new ArrayList<>();
         System.out.println("Calcul des IDF");
-        listeQ.add(new Query("olive oil health benefit", listeDoc, "2009011"));
-        //listeQ.add(new Query("arbre ernest", listeDoc, "2009011"));
+        //listeQ.add(new Query("olive oil health benefit", listeDoc, "2009011"));
+        listeQ.add(new Query("arbre ernest", listeDoc, "2009011"));
         System.out.println("1/7");
         listeQ.add(new Query("notting hill film actors", listeDoc, "2009036"));
         System.out.println("2/7");
@@ -169,29 +169,29 @@ public class Indexation {
                     }
 
 
-                    mapFinale.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                    mapFinale.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                     //System.out.println(listeNumQ.get(q) + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]");
                     switch (q) {
                         case 0:
-                            mapQuery1.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery1.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                         case 1:
-                            mapQuery2.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery2.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                         case 2:
-                            mapQuery3.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery3.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                         case 3:
-                            mapQuery4.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery4.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                         case 4:
-                            mapQuery5.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery5.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                         case 5:
-                            mapQuery6.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery6.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                         case 6:
-                            mapQuery7.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrançois /article[1]", cosSim);
+                            mapQuery7.put(query.id + " Q0 " + doc.id + " " + tag + " " + cosSim + " MadjidPierreBunyaminFrancois /article[1]", cosSim);
                             break;
                     }
 
@@ -253,15 +253,15 @@ public class Indexation {
 
             try {
                 testOut = new PrintWriter(new OutputStreamWriter(
-                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_01_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
+                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrancois_05_01_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
                 run2 = new PrintWriter(new OutputStreamWriter(
-                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_02_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
+                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrancois_05_02_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
                 run3 = new PrintWriter(new OutputStreamWriter(
-                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_03_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
+                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrancois_05_03_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
                 run4 = new PrintWriter(new OutputStreamWriter(
-                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_04_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
+                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrancois_05_04_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
                 run5 = new PrintWriter(new OutputStreamWriter(
-                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrançois_03_05_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
+                        new BufferedOutputStream(new FileOutputStream("MadjidPierreBunyaminFrancois_05_05_" + Main.choix + "_articles_k" + Main.k1 + "b" + Main.b + ".txt"))));
             } catch (Exception e1) {
                 e1.printStackTrace();
                 System.out.println(e1);

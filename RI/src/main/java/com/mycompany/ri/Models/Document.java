@@ -101,7 +101,7 @@ public class Document {
         avgD = avgD / listeDoc.size();
 
         for (Map.Entry<String, Double> entry : query.index.entrySet()) {
-            score += ((this.getTermFrequecy(entry.getKey()) * (k1 + 1)) / (this.getTermFrequecy(entry.getKey()) + k1 * ((1 - b) + b * (tailleD / avgD)))) * query.getIDfBM25(listeDoc.size(), entry.getKey());
+            score += ((this.getTf(entry.getKey()) * (k1 + 1)) / (this.getTf(entry.getKey()) + k1 * ((1 - b) + b * (tailleD / avgD)))) * query.getIDfBM25(listeDoc.size(), entry.getKey());
         }
 
 
@@ -133,7 +133,7 @@ public class Document {
         Query test=query;
         for (Map.Entry<String, Double> entry : query.index.entrySet()) {
 
-            score += (1+Math.log10(this.getTermFrequecy(entry.getKey()))) * query.getIDf(listDoc.size(),entry.getKey());
+            score += (1+Math.log10(this.getTf(entry.getKey()))) * query.getIDf(listDoc.size(),entry.getKey());
         }
         return score;
 

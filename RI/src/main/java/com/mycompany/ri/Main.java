@@ -41,7 +41,7 @@ public class Main {
         }
 
 
-        Indexation.indexFile("./file", stopWords);
+        Indexation.indexFile("./testFileArbre", stopWords);
         //Indexation.indexFile("./file", stopWords);
 
 
