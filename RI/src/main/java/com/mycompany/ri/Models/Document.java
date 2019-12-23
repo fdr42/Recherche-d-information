@@ -83,25 +83,19 @@ public class Document {
      *
      * @return score BM25
      */
-    public double okapi(Query query, List<Document> listeDoc) {
+    public double okapi(Query query,double sizeList, double avgD) {
         double score = 0;
 
         double k1 = Main.k1;
         double b = Main.b;
-        double tailleD = this.totalWords;
 
         //attention ici c'est la taille moyenne de la collection d'ou est extrait
 
-        double avgD = 0;
 
-
-        for (Document document : listeDoc) {
-            avgD += document.totalWords;
-        }
-        avgD = avgD / listeDoc.size();
 
         for (Map.Entry<String, Double> entry : query.index.entrySet()) {
-            score += ((this.getTf(entry.getKey()) * (k1 + 1)) / (this.getTf(entry.getKey()) + k1 * ((1 - b) + b * (tailleD / avgD)))) * query.getIDfBM25(listeDoc.size(), entry.getKey());
+            double TF=this.getTf(entry.getKey());
+            score += (( TF* (k1 + 1)) / (TF + k1 * ((1 - b) + b * (this.totalWords / avgD)))) * query.getIDfBM25(sizeList, entry.getKey());
         }
 
 
@@ -133,7 +127,7 @@ public class Document {
         Query test=query;
         for (Map.Entry<String, Double> entry : query.index.entrySet()) {
 
-            score += (1+Math.log10(this.getTf(entry.getKey()))) * query.getIDf(listDoc.size(),entry.getKey());
+            score += (Math.log10(1+this.getTf(entry.getKey()))) * query.getIDf(listDoc.size(),entry.getKey());
         }
         return score;
 

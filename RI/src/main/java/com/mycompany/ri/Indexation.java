@@ -54,7 +54,7 @@ public class Indexation {
         Document currentDoc = null;
         File file = new File(path);
         Scanner input = new Scanner(file);
-        input.useDelimiter(" +|\\n|\\r|\'|\"|[\\\\.,()=-]");
+        input.useDelimiter("!|:|;| +|\\n|\\r|\'|\"|[\\\\.,()|?=-]");
         int j = 0;
         double i = 0;
         int nbOlives=0;
@@ -74,10 +74,12 @@ public class Indexation {
                 //  System.out.println(currentDoc.index.size());
                 // System.out.println(currentDoc.index);
 
-            } else if (!stopWords.contains(string)
-                   && PorterStemmer.stemWord(string).length()>1
+            } else if (!stopWords.contains(string) && string.length()>1
+                    && string.matches("^[a-zA-Z0-9]*$")
             ) {//Ajout des mots a l'index
-                string= string.replaceAll(".\\d.", "");
+
+
+                string= string.replaceAll("\\d", "");
                 string = PorterStemmer.stemWord(string);
                 if(string.length()>1){
                 currentDoc.index.put(string, currentDoc.getTf(string) + 1);
@@ -89,15 +91,7 @@ public class Indexation {
 
         }
         //  System.out.println("Total unique = " + index.size());
-        for (Document bite:listeDoc) {
-            try {
-                nbOlives += bite.index.get("oliv");
-            }catch (Exception e){
 
-            }
-
-
-        }
         System.out.println("<<<<<<<<<<<<<<<<" + nbOlives);
 
         System.out.println("TAILLE LISTE DOC >>> " + listeDoc.size());
@@ -106,8 +100,8 @@ public class Indexation {
 
         List<Query> listeQ = new ArrayList<>();
         System.out.println("Calcul des IDF");
-        //listeQ.add(new Query("olive oil health benefit", listeDoc, "2009011"));
-        listeQ.add(new Query("arbre ernest", listeDoc, "2009011"));
+        listeQ.add(new Query("olive oil health benefit", listeDoc, "2009011"));
+        //listeQ.add(new Query("arbre ernest", listeDoc, "2009011"));
         System.out.println("1/7");
         listeQ.add(new Query("notting hill film actors", listeDoc, "2009036"));
         System.out.println("2/7");
@@ -155,7 +149,14 @@ public class Indexation {
                     if (Main.choix.equals("ATN")) {
                         cosSim = Document.atn(doc, query, listeDoc);
                     } else if (Main.choix.equals("BM25")) {
-                        cosSim = doc.okapi(query, listeDoc);
+                        double avgD = 0;
+
+
+                        for (Document document : listeDoc) {
+                            avgD += document.totalWords;
+                        }
+                        avgD = avgD / listeDoc.size();
+                        cosSim = doc.okapi(query, listeDoc.size(), avgD);
                     } else if (Main.choix.equals("LTN")) {
                         cosSim = doc.LTN(query, listeDoc);
                     } else {
